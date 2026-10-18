@@ -1,0 +1,303 @@
+-- [[ Chilli Hub V6 - Key System with Silent Local Persistence ]] --
+
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+-- Tên tệp lưu key cục bộ (ẩn trong bộ nhớ thiết bị)
+local KEY_FILE_NAME = "ChilliHubV6_KeyData.txt"
+local CORRECT_KEY = "ChilliHubV6KeyjKaowi - Kalwowjwnwiwih"
+local GET_KEY_LINK = "https://link4m.net/CR36ed"
+local EXPIRATION_SECONDS = 86400 -- 24 giờ (86400 giây)
+
+-- Hàm kiểm tra và thực thi mã chính
+local function executeMainScript()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://robloxscriptbest.com/script/loader.php?script=chillihub_v6_pro0"))()
+    end)
+    if not success then
+        warn("Execution Error: " .. tostring(err))
+    end
+end
+
+-- Hàm kiểm tra Key đã lưu ẩn trong máy
+local function checkSavedKey()
+    if isfile and readfile and isfile(KEY_FILE_NAME) then
+        local success, content = pcall(readfile, KEY_FILE_NAME)
+        if success and content then
+            local savedKey, savedTime = string.match(content, "^(.-)|(%d+)$")
+            if savedKey and savedTime then
+                savedTime = tonumber(savedTime)
+                if savedKey == CORRECT_KEY and (os.time() - savedTime) < EXPIRATION_SECONDS then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+-- Hàm lưu Key ngầm vào thiết bị
+local function saveKeyLocally(key)
+    if writefile then
+        pcall(function()
+            writefile(KEY_FILE_NAME, key .. "|" .. tostring(os.time()))
+        end)
+    end
+end
+
+-- Tự động bỏ qua Menu nếu Key còn hạn dùng
+if checkSavedKey() then
+    executeMainScript()
+    return
+end
+
+-- Xóa menu cũ nếu tồn tại
+if CoreGui:FindFirstChild("ChilliHubKeySystem") then
+    CoreGui.ChilliHubKeySystem:Destroy()
+end
+
+-- ScreenGui chính
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ChilliHubKeySystem"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Khung Menu chính
+local Container = Instance.new("Frame")
+Container.Name = "Container"
+Container.Parent = ScreenGui
+Container.AnchorPoint = Vector2.new(0.5, 0.5)
+Container.BackgroundColor3 = Color3.fromRGB(16, 14, 18)
+Container.BackgroundTransparency = 0.05
+Container.BorderSizePixel = 0
+Container.Position = UDim2.new(0.5, 0, 0.5, 0)
+Container.Size = UDim2.new(0, 400, 0, 260)
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 14)
+UICorner.Parent = Container
+
+-- Viền Neon Đỏ
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Parent = Container
+UIStroke.Color = Color3.fromRGB(220, 30, 45)
+UIStroke.Transparency = 0.2
+UIStroke.Thickness = 1.8
+
+-- Hiệu ứng Gradient
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 12, 15)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 10, 14))
+})
+UIGradient.Rotation = 45
+UIGradient.Parent = Container
+
+-- Tiêu đề "Chilli Hub V6"
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Parent = Container
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 20)
+Title.Size = UDim2.new(1, 0, 0, 32)
+Title.Font = Enum.Font.FredokaOne
+Title.Text = "Chilli Hub V6"
+Title.TextColor3 = Color3.fromRGB(255, 45, 65)
+Title.TextSize = 24
+
+local TitleGradient = Instance.new("UIGradient")
+TitleGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 70, 85)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 20, 40))
+})
+TitleGradient.Parent = Title
+
+-- Phụ đề
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Parent = Container
+Subtitle.BackgroundTransparency = 1
+Subtitle.Position = UDim2.new(0, 0, 0, 52)
+Subtitle.Size = UDim2.new(1, 0, 0, 18)
+Subtitle.Font = Enum.Font.GothamMedium
+Subtitle.Text = "AUTHENTICATION REQUIRED"
+Subtitle.TextColor3 = Color3.fromRGB(150, 140, 150)
+Subtitle.TextSize = 11
+
+-- Ô nhập Key
+local TextBoxHolder = Instance.new("Frame")
+TextBoxHolder.Name = "TextBoxHolder"
+TextBoxHolder.Parent = Container
+TextBoxHolder.BackgroundColor3 = Color3.fromRGB(24, 20, 26)
+TextBoxHolder.BorderSizePixel = 0
+TextBoxHolder.Position = UDim2.new(0.08, 0, 0, 85)
+TextBoxHolder.Size = UDim2.new(0.84, 0, 0, 42)
+
+local TextBoxCorner = Instance.new("UICorner")
+TextBoxCorner.CornerRadius = UDim.new(0, 10)
+TextBoxCorner.Parent = TextBoxHolder
+
+local TextBoxStroke = Instance.new("UIStroke")
+TextBoxStroke.Parent = TextBoxHolder
+TextBoxStroke.Color = Color3.fromRGB(70, 40, 50)
+TextBoxStroke.Transparency = 0.5
+TextBoxStroke.Thickness = 1
+
+local KeyTextBox = Instance.new("TextBox")
+KeyTextBox.Parent = TextBoxHolder
+KeyTextBox.BackgroundTransparency = 1
+KeyTextBox.Position = UDim2.new(0.04, 0, 0, 0)
+KeyTextBox.Size = UDim2.new(0.92, 0, 1, 0)
+KeyTextBox.Font = Enum.Font.Gotham
+KeyTextBox.PlaceholderText = "Enter key here..."
+KeyTextBox.Text = ""
+KeyTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyTextBox.PlaceholderColor3 = Color3.fromRGB(110, 100, 110)
+KeyTextBox.TextSize = 13
+KeyTextBox.ClearTextOnFocus = false
+
+-- Nút Check Key
+local CheckButton = Instance.new("TextButton")
+CheckButton.Name = "CheckButton"
+CheckButton.Parent = Container
+CheckButton.BackgroundColor3 = Color3.fromRGB(220, 30, 45)
+CheckButton.BorderSizePixel = 0
+CheckButton.Position = UDim2.new(0.08, 0, 0, 138)
+CheckButton.Size = UDim2.new(0.40, 0, 0, 38)
+CheckButton.Font = Enum.Font.GothamBold
+CheckButton.Text = "Check Key"
+CheckButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CheckButton.TextSize = 13
+
+local CheckCorner = Instance.new("UICorner")
+CheckCorner.CornerRadius = UDim.new(0, 10)
+CheckCorner.Parent = CheckButton
+
+-- Nút Get Key
+local GetKeyButton = Instance.new("TextButton")
+GetKeyButton.Name = "GetKeyButton"
+GetKeyButton.Parent = Container
+GetKeyButton.BackgroundColor3 = Color3.fromRGB(28, 24, 30)
+GetKeyButton.BorderSizePixel = 0
+GetKeyButton.Position = UDim2.new(0.52, 0, 0, 138)
+GetKeyButton.Size = UDim2.new(0.40, 0, 0, 38)
+GetKeyButton.Font = Enum.Font.GothamBold
+GetKeyButton.Text = "Get Key"
+GetKeyButton.TextColor3 = Color3.fromRGB(200, 190, 200)
+GetKeyButton.TextSize = 13
+
+local GetKeyCorner = Instance.new("UICorner")
+GetKeyCorner.CornerRadius = UDim.new(0, 10)
+GetKeyCorner.Parent = GetKeyButton
+
+local GetKeyStroke = Instance.new("UIStroke")
+GetKeyStroke.Parent = GetKeyButton
+GetKeyStroke.Color = Color3.fromRGB(60, 50, 60)
+GetKeyStroke.Thickness = 1
+
+-- Khung Thông Báo Hiện Đại
+local StatusBadge = Instance.new("Frame")
+StatusBadge.Name = "StatusBadge"
+StatusBadge.Parent = Container
+StatusBadge.BackgroundColor3 = Color3.fromRGB(30, 18, 22)
+StatusBadge.BackgroundTransparency = 1
+StatusBadge.BorderSizePixel = 0
+StatusBadge.Position = UDim2.new(0.08, 0, 0, 192)
+StatusBadge.Size = UDim2.new(0.84, 0, 0, 36)
+
+local BadgeCorner = Instance.new("UICorner")
+BadgeCorner.CornerRadius = UDim.new(0, 8)
+BadgeCorner.Parent = StatusBadge
+
+local BadgeStroke = Instance.new("UIStroke")
+BadgeStroke.Parent = StatusBadge
+BadgeStroke.Color = Color3.fromRGB(255, 60, 70)
+BadgeStroke.Transparency = 1
+BadgeStroke.Thickness = 1
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Parent = StatusBadge
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Size = UDim2.new(1, 0, 1, 0)
+StatusLabel.Font = Enum.Font.GothamMedium
+StatusLabel.Text = ""
+StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+StatusLabel.TextTransparency = 1
+StatusLabel.TextSize = 12
+
+-- Hàm hiển thị thông báo với hiệu ứng Fade
+local function showNotification(text, textColor, strokeColor, bgColor)
+    StatusLabel.Text = text
+    StatusLabel.TextColor3 = textColor
+    BadgeStroke.Color = strokeColor
+    StatusBadge.BackgroundColor3 = bgColor
+    
+    TweenService:Create(StatusBadge, TweenInfo.new(0.25), {BackgroundTransparency = 0.2}):Play()
+    TweenService:Create(BadgeStroke, TweenInfo.new(0.25), {Transparency = 0.3}):Play()
+    TweenService:Create(StatusLabel, TweenInfo.new(0.25), {TextTransparency = 0}):Play()
+end
+
+-- Hiệu ứng Lắc Mượt
+local isShaking = false
+local function smoothShake()
+    if isShaking then return end
+    isShaking = true
+    
+    local originalPos = UDim2.new(0.5, 0, 0.5, 0)
+    local offsets = {10, -8, 6, -4, 2, 0}
+    local tweenInfo = TweenInfo.new(0.05, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    
+    for _, offset in ipairs(offsets) do
+        local targetPos = originalPos + UDim2.new(0, offset, 0, 0)
+        local tween = TweenService:Create(Container, tweenInfo, {Position = targetPos})
+        tween:Play()
+        tween.Completed:Wait()
+    end
+    
+    isShaking = false
+end
+
+-- Sự kiện Kiểm tra Key
+CheckButton.MouseButton1Click:Connect(function()
+    local inputKey = KeyTextBox.Text
+    
+    if inputKey == CORRECT_KEY then
+        saveKeyLocally(inputKey)
+        
+        showNotification(
+            "Key verified successfully! Executing...",
+            Color3.fromRGB(120, 255, 160),
+            Color3.fromRGB(40, 200, 100),
+            Color3.fromRGB(15, 35, 22)
+        )
+        
+        TweenService:Create(Container, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
+        task.wait(0.4)
+        ScreenGui:Destroy()
+        
+        executeMainScript()
+    else
+        showNotification(
+            "Incorrect key! Please try again.",
+            Color3.fromRGB(255, 110, 110),
+            Color3.fromRGB(230, 40, 60),
+            Color3.fromRGB(35, 15, 20)
+        )
+        
+        KeyTextBox.Text = ""
+        smoothShake()
+    end
+end)
+
+-- Sự kiện Bấm Get Key (Sử dụng link mới)
+GetKeyButton.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(GET_KEY_LINK)
+    end
+    showNotification(
+        "Key link copied to clipboard!",
+        Color3.fromRGB(110, 200, 255),
+        Color3.fromRGB(40, 140, 230),
+        Color3.fromRGB(15, 25, 38)
+    )
+end)
